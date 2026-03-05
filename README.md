@@ -118,8 +118,6 @@ npm run dev
 ![Department Edit](public/images/screenshots/edit-departmentand-category%20list%20page.png)
 
 
-#### 🧑‍💼 Vendor Panel
-
 ##### 🧾 Product List
 ![Product List](public/images/screenshots/vendor-product-list-page.png)
 
