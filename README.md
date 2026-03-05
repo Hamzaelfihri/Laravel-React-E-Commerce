@@ -1,4 +1,4 @@
-# 🛒 Multi-Vendor eCommerce Platform (Laravel 12 + React + Inertia.js)
+# 🛒 Laravel-React-E-Commerce (Laravel 12 + React + Inertia.js)
 
 A modern, full-stack **Multi-Vendor eCommerce Website** built using:
 
