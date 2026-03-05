@@ -118,12 +118,6 @@ npm run dev
 ![Department Edit](public/images/screenshots/edit-departmentand-category%20list%20page.png)
 
 
-##### 🧾 Product List
-![Product List](public/images/screenshots/vendor-product-list-page.png)
-
-##### 🖼️ Product Image Upload
-![Product Images](public/images/screenshots/product-images.png)
-
 ##### 🔀 Variation Types Management
 ![Variation Types](public/images/screenshots/product-variation-types.png)
 
