@@ -331,12 +331,7 @@ function Show({
             {/* vendor */}
             <p className="mb-4">
               by{" "}
-              <Link
-                href={route("vendor.profile", product.user.store_name)}
-                className="hover:underline"
-              >
-                {product.user.name}
-              </Link>{" "}
+              <span className="font-medium">{product.user.name}</span>{" "}
               in{" "}
               <Link
                 href={route("product.byDepartment", product.department.slug)}

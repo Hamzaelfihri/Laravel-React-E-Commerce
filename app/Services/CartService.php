@@ -142,7 +142,7 @@ class CartService implements CartInterface
                         'image' => $imageUrl ?: $product->getFirstMediaUrl('images', 'small'),
                         'users' => [
                             'id' => $product->created_by,
-                            'name' => $product->user->vendor->store_name,
+                            'name' => $product->user->vendor?->store_name,
                         ]
                     ];
                 }

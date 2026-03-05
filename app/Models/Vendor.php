@@ -6,9 +6,12 @@ use App\Enum\VendorStatusEnum;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+    use Illuminate\Database\Eloquent\Factories\HasFactory; // 👈 AJOUTE ÇA
 
 class Vendor extends Model
 {
+    use HasFactory; // 👈 AJOUTE ÇA
+
     protected $primaryKey = 'user_id';
 
     public function scopeEligibleForPayout(Builder $query): Builder

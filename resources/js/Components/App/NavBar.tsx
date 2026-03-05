@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { usePage } from "@inertiajs/react";
 import { PageProps } from "@/types";
-import DepartmentNavBar from "./DepartmentNavBar";
 import MobileMenu from "./NavBar/MobileMenu";
 import Logo from "./NavBar/Logo";
 import DesktopNavLinks from "./NavBar/DesktopNavLinks";
@@ -40,7 +39,7 @@ export default function NavBar() {
       </div>
 
       {/* Department Nav */}
-      <DepartmentNavBar />
+     
     </>
   );
 }

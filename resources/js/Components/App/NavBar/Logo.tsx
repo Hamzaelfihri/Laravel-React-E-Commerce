@@ -5,9 +5,10 @@ export default function Logo() {
   return (
     <Link href="/" className="flex-shrink-0">
       <img
-        src="/images/logo-karthive-removebg.jpg"
-        alt="Karthive"
-        className="h-8 w-auto"
+        src="/images/shop-hero.png"
+        alt="HEELECTRONIC"
+        className="h-32 w-32 object-contain"
+
       />
     </Link>
   );

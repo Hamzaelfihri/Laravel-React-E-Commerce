@@ -63,8 +63,6 @@ export default function Shop({ products, filters }: ShopPageProps) {
     <AuthenticatedLayout>
       <Head title="Shop" />
 
-      <Hero />
-
       <div className="flex flex-col md:flex-row px-4 py-6 gap-6 bg-gray-50">
         {/* Left Filter Sidebar */}
         <div className="w-full md:w-1/5 bg-white p-4 rounded shadow">

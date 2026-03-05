@@ -2,136 +2,91 @@
 
 namespace App\Filament\Resources;
 
-use App\Enum\ProductStatusEnum;
-use App\Enum\RolesEnum;
 use App\Filament\Resources\ProductResource\Pages;
-use App\Filament\Resources\ProductResource\Pages\EditProduct;
-use App\Filament\Resources\ProductResource\Pages\ProductImages;
-use App\Filament\Resources\ProductResource\Pages\ProductVariations;
-use App\Filament\Resources\ProductResource\Pages\ProductVariationTypes;
-use App\Filament\Resources\ProductResource\RelationManagers;
 use App\Models\Product;
-use Filament\Facades\Filament;
 use Filament\Forms;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
-use Filament\Forms\Set;
-use Filament\Pages\SubNavigationPosition;
-use Filament\Resources\Pages\Page;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Str;
 
 class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
 
-    protected static ?string $navigationIcon = 'heroicon-s-queue-list';
-
-    protected static SubNavigationPosition $subNavigationPosition = SubNavigationPosition::End;
-
-    // built in function
-    // get the products created by that logined vendor user
-    public static function getEloquentQuery(): Builder
-    {
-        return parent::getEloquentQuery()->forVendor();
-    }
+    protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-
-                Grid::make()
+                Forms\Components\Section::make('Product Information')
                     ->schema([
-
-                        TextInput::make('title')
+                        Forms\Components\TextInput::make('title')
+                            ->required()
+                            ->maxLength(2000)
                             ->live(onBlur: true)
-                            ->required()
-                            ->afterStateUpdated(fn(Set $set, ?string $state) => $set('slug', Str::slug($state))),
-
-                        TextInput::make('slug')
-                            ->required(),
-
-                        Select::make('department_id')
-                            ->relationship('department', 'name')
-                            ->label(__('Department'))
-                            ->preload()
-                            ->searchable()
-                            ->required()
-                            ->reactive() //makes the field reactive to changes
-                            ->afterStateUpdated(function (callable $set) {
-                                $set('category_id', null); // reset category when department changes
+                            ->afterStateUpdated(function ($state, callable $set) {
+                                $set('slug', \Illuminate\Support\Str::slug($state));
                             }),
-
-                        Select::make('category_id')
-                            ->relationship(
-                                name: 'category',
-                                titleAttribute: 'name',
-                                modifyQueryUsing: function (Builder $query, callable $get) {
-                                    // modify query based on the selected department
-                                    $departmentId = $get('department_id');
-                                    if ($departmentId) {
-                                        // filter category based on department id
-                                        $query->where('department_id', $departmentId);
-                                    }
-                                }
-                            )
-                            ->label(__('Category'))
-                            ->preload()
-                            ->searchable()
+                        Forms\Components\TextInput::make('slug')
                             ->required()
+                            ->maxLength(2000),
+                        Forms\Components\Textarea::make('description')
+                            ->columnSpanFull(),
+                    ])->columns(2),
+
+                Forms\Components\Section::make('Classification')
+                    ->schema([
+                        Forms\Components\Select::make('department_id')
+                            ->relationship('department', 'name')
+                            ->required(),
+                        Forms\Components\Select::make('category_id')
+                            ->relationship('category', 'name')
+                            ->required(),
+                    ])->columns(2),
+
+                Forms\Components\Section::make('Pricing & Stock')
+                    ->schema([
+                        Forms\Components\TextInput::make('price')
+                            ->required()
+                            ->numeric()
+                            ->prefix('$'),
+                        Forms\Components\TextInput::make('quantity')
+                            ->numeric()
+                            ->default(0),
+                        Forms\Components\Select::make('status')
+                            ->options([
+                                'active'   => 'Active',
+                                'inactive' => 'Inactive',
+                                'draft'    => 'Draft',
+                            ])
+                            ->required()
+                            ->default('active'),
+                    ])->columns(3),
+
+                Forms\Components\Section::make('Images')
+                    ->schema([
+                        Forms\Components\SpatieMediaLibraryFileUpload::make('images')
+                            ->multiple()
+                            ->image()
+                            ->collection('images')
+                            ->reorderable()
+                            ->columnSpanFull(),
                     ]),
 
-                RichEditor::make('description')
-                    ->required()
-                    ->toolbarButtons([
-                        'blockquote',
-                        'bold',
-                        'bulletList',
-                        'h2',
-                        'h3',
-                        'italic',
-                        'link',
-                        'orderedList',
-                        'redo',
-                        'strike',
-                        'underline',
-                        'undo',
-                        'table'
-                    ])
-                    ->columnSpan(2),
-
-                TextInput::make('price')
-                    ->required()
-                    ->numeric(),
-
-                TextInput::make('quantity')
-                    ->required()
-                    ->integer(),
-
-                Select::make('status')
-                    ->options(ProductStatusEnum::labels())
-                    ->default(ProductStatusEnum::Draft->value)
-                    ->required(),
-
-                Section::make('SEO')
-                    ->collapsible()
+                Forms\Components\Section::make('SEO')
                     ->schema([
-                        TextInput::make('meta_title'),
-                        Textarea::make('meta_description')
-                    ])
+                        Forms\Components\TextInput::make('meta_title')
+                            ->maxLength(255),
+                        Forms\Components\Textarea::make('meta_description')
+                            ->columnSpanFull(),
+                    ])->columns(2)->collapsed(),
+
+                Forms\Components\Hidden::make('created_by')
+                    ->default(fn () => auth()->id()),
+                Forms\Components\Hidden::make('updated_by')
+                    ->default(fn () => auth()->id()),
             ]);
     }
 
@@ -139,39 +94,39 @@ class ProductResource extends Resource
     {
         return $table
             ->columns([
-
-                SpatieMediaLibraryImageColumn::make('images')
+                Tables\Columns\SpatieMediaLibraryImageColumn::make('images')
                     ->collection('images')
-                    ->limit(1)
-                    ->label('Image')
-                    ->conversion('thumb'),
-
-                TextColumn::make('title')
-                    ->sortable()
-                    ->words(10)
-                    ->searchable(),
-
-                TextColumn::make('status')
+                    ->limit(1),
+                Tables\Columns\TextColumn::make('title')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('department.name')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('category.name')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('price')
+                    ->money()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('status')
                     ->badge()
-                    ->colors(ProductStatusEnum::colors()),
-
-                TextColumn::make('department.name'),
-
-                TextColumn::make('category.name'),
-
-                TextColumn::make('created_at')
-                    ->dateTime(),
+                    ->color(fn (string $state): string => match ($state) {
+                        'active'   => 'success',
+                        'draft'    => 'warning',
+                        'inactive' => 'danger',
+                        default    => 'gray',
+                    }),
+                Tables\Columns\TextColumn::make('quantity')
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->filters([
-
-                SelectFilter::make('status')
-                    ->options(ProductStatusEnum::labels()),
-
-                SelectFilter::make('department_id')
-                    ->relationship('department', 'name'),
-            ])
+            ->filters([])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -182,38 +137,15 @@ class ProductResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListProducts::route('/'),
+            'index'  => Pages\ListProducts::route('/'),
             'create' => Pages\CreateProduct::route('/create'),
-            'edit' => Pages\EditProduct::route('/{record}/edit'),
-            'images' => Pages\ProductImages::route('/{record}/images'),
-            'variation-types' => Pages\ProductVariationTypes::route('/{record}/variation-types'),
-            'variations' => Pages\ProductVariations::route('/{record}/variations'),
+            'edit'   => Pages\EditProduct::route('/{record}/edit'),
         ];
-    }
-
-    public static function getRecordSubNavigation(Page $page): array
-    {
-        return $page->generateNavigationItems([
-            EditProduct::class,
-            ProductImages::class,
-            ProductVariationTypes::class,
-            ProductVariations::class,
-        ]);
-    }
-
-    // admin users cannot create product  and only vendor can create product
-    public static function canViewAny(): bool
-    {
-        $user = Filament::auth()->user();
-
-        return $user && $user->hasRole(RolesEnum::Vendor);
     }
 }

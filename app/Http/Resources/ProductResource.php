@@ -37,18 +37,18 @@ class ProductResource extends JsonResource
             'price'          => number_format($this->price, 2),
             'quantity'       => $this->quantity,
             'image'          => $this->getFirstMediaUrl('images'),
-            'images'         => $images->map(function ($image) {
+            'images' => $images->map(function ($image) {
                 return [
                     'id'    => $image->id,
-                    'thumb' => $image->getUrl('thumb'),
-                    'small' => $image->getUrl('small'),
-                    'large' => $image->getUrl('large'),
-                ];
-            }),
+                    'thumb' => $image->getUrl(),
+                    'small' => $image->getUrl(),
+                    'large' => $image->getUrl(),
+                    ];
+                }),
             'user'           => [
                 'id'   => $this->user->id,
                 'name' => $this->user->name,
-                'store_name' => $this->user->vendor->store_name,
+                'store_name' => $this->user->vendor?->store_name,
             ],
             'department'     => [
                 'id'   => $this->department->id,

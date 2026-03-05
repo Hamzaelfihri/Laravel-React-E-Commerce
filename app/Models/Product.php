@@ -22,14 +22,14 @@ class Product extends Model implements HasMedia
     // make different version of each image uploading
     public function registerMediaConversions(?Media $media = null): void
     {
-        $this->addMediaConversion('thumb')
+        /*$this->addMediaConversion('thumb')
             ->width(100);
 
         $this->addMediaConversion('small')
             ->width(480);
 
         $this->addMediaConversion('large')
-            ->width(1200);
+            ->width(1200);*/
     }
 
     // ------------ relationships -------------------------
@@ -85,19 +85,12 @@ class Product extends Model implements HasMedia
 
     public function scopePublished(Builder $query): Builder
     {
-        return $query->where('products.status', ProductStatusEnum::Published);
+        return $query->where('products.status', 'active');
     }
 
-    public function scopeForWebsite(Builder $query): Builder
+   public function scopeForWebsite(Builder $query): Builder
     {
-        return $query->published()->vendorApproved();
-    }
-
-    public function scopeVendorApproved(Builder $query)
-    {
-        return $query
-            ->join('vendors', 'vendors.user_id', '=', 'products.created_by')
-            ->where('vendors.status', VendorStatusEnum::Approved->value);
+        return $query->where('products.status', 'active');
     }
 
     public function scopeSearchKeyword(Builder $query, $keyword)
